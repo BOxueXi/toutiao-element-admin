@@ -1,7 +1,45 @@
+import layout from '@/views/layout'
 export default [
   {
     path: '/',
-    redirect: '/login'
+    component: layout,
+    children: [
+      {
+        path: '/home',
+        name: 'home',
+        component: () => import('@/views/home/index.vue')
+      },
+      {
+        path: '/article',
+        name: 'article',
+        component: () => import('@/views/article/index.vue')
+      },
+      {
+        path: '/image',
+        name: 'image',
+        component: () => import('@/views/image/index.vue')
+      },
+      {
+        path: '/publish',
+        name: 'publish',
+        component: () => import('@/views/publish/index.vue')
+      },
+      {
+        path: '/comment',
+        name: 'comment',
+        component: () => import('@/views/comment/index.vue')
+      },
+      {
+        path: '/fans',
+        name: 'fans',
+        component: () => import('@/views/fans/index.vue')
+      },
+      {
+        path: '/setting',
+        name: 'setting',
+        component: () => import('@/views/setting/index.vue')
+      }
+    ]
   },
   {
     path: '/login',

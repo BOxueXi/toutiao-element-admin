@@ -23,39 +23,66 @@
 </template>
 
 <script>
-  import {login} from '@/api/login'
-  export default {
-    name: 'Login',
-    data() {
-      return {
-        form: {
-          mobile: '13911111111',
-          code:'246810',
-          xieyi: ''
-        },
-        rules: {
-         mobile: [{ required: true, message: '手机号码必填', trigger: 'blur' }],
-         code: [{required: true, message: '校验码必填', trigger: 'blur'}],
-         xieyi: [{required: true, message: '必选', trigger: 'change'}]
-        },
-        loading: false
-      }
-    },
-    methods: {
-      handleLogin(formName) {
-              this.$refs[formName].validate((valid) => {
-                if (valid) {
-                  this.loading = true
-                  login(this.form).then(res=>{
-                    console.log(res)
-                  }).finally(()=>{
-                    this.loading = false
-                  })
-                }
-              });
-          }
+import {
+  login
+} from '@/api/login'
+import config from '@/config'
+import {
+  setToken
+} from '@/utils/helper'
+export default {
+  name: 'Login',
+  data () {
+    return {
+      form: {
+        mobile: '13911111111',
+        code: '246810',
+        xieyi: false
+      },
+      rules: {
+        mobile: [{
+          required: true,
+          message: '手机号码必填',
+          trigger: 'blur'
+        }],
+        code: [{
+          required: true,
+          message: '校验码必填',
+          trigger: 'blur'
+        }],
+        xieyi: [{
+          validator: function (rule, value, callback) {
+            if (value) {
+              callback()
+            } else {
+              callback(new Error('请选择'))
+            }
+          },
+          trigger: 'change'
+        }]
+      },
+      loading: false
+    }
+  },
+  methods: {
+    handleLogin (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.loading = true
+          login(this.form).then(res => {
+            console.log(res)
+            setToken(res.data.token)
+            this.$router.push({
+              name: config.homeName
+            })
+          }).finally(() => {
+            this.loading = false
+          })
+        }
+      })
     }
   }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -67,21 +94,24 @@
     right: 0;
     background: url(../../assets/img/login_bg.jpg) no-repeat;
     background-size: cover;
-    .login-form{
+
+    .login-form {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%,-50%);
+      transform: translate(-50%, -50%);
       width: 400px;
       height: 340px;
       padding: 0 50px 50px;
       box-sizing: border-box;
       background-color: #fff;
-     text-align: center;
-      .login-logo{
+      text-align: center;
+
+      .login-logo {
         width: 50%;
         margin: 14px 0;
       }
+
       .btn {
         width: 100%;
         font-size: 16px;

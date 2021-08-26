@@ -16,7 +16,7 @@ export const fetch = (option) => {
   const axiosConfig = merge({
     method: 'post',
     headers: {
-      Authorization: 'Bearer' + token,
+      Authorization: 'Bearer ' + token,
       ChannelCode: '01',
       AcessParty: 'ycloud'
     }
@@ -70,6 +70,13 @@ export const get = (url, data) => {
   return fetch({
     url: url,
     method: 'get'
+  })
+}
+
+export const patch = (url, data) => {
+  return fetch({
+    url: url,
+    method: 'patch'
   })
 }
 
