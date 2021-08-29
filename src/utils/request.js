@@ -5,9 +5,11 @@ import {
 } from './helper'
 // import config from '@/config'
 import merge from 'lodash/merge'
+import jsonBig from 'json-bigint' // 处理数字类型超出完全范围
 import {
   Message
 } from 'element-ui'
+import { transferData } from '@/utils/tools'
 const baseURL = process.env.VUE_APP_BASE_URL
 const axios = new HttpRequest(baseURL)
 
@@ -19,7 +21,17 @@ export const fetch = (option) => {
       Authorization: 'Bearer ' + token,
       ChannelCode: '01',
       AcessParty: 'ycloud'
-    }
+    },
+    transformResponse: [function (data) { // 处理后台返回的原始数据， axios内部默认使用JSON.parse()处理后台返回的数据
+      // 对 data 进行任意转换处理
+      try {
+        // 作用1：把json字符串转为js对象
+        // 作用2：把里面的大数字做安全处理
+        return jsonBig.parse(data)
+      } catch (e) {
+        return data
+      }
+    }]
   }, option)
   return new Promise((resolve, reject) => {
     axios.request(axiosConfig).then(res => {
@@ -67,9 +79,19 @@ export const post = (url, data) => {
 }
 
 export const get = (url, data) => {
+  data = transferData(data)
   return fetch({
     url: url,
-    method: 'get'
+    method: 'get',
+    params: data
+  })
+}
+export const deleteMethod = (url, data) => {
+  data = transferData(data)
+  return fetch({
+    url: url,
+    method: 'delete',
+    params: data
   })
 }
 
@@ -85,7 +107,7 @@ export const upload = (url, formData) => {
     url: url,
     data: formData,
     headers: {
-      'Content-Type': 'multipart.form-data'
+      'Content-Type': 'multipart/form-data'
     }
   })
 }
