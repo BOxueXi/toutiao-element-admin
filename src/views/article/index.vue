@@ -208,7 +208,7 @@ export default {
     },
     // 修改
     handleEdit (row) {
-      this.$router.push('/publish?id='+ row.id)
+      this.$router.push('/publish?id=' + row.id)
     },
     // 删除
     handleDel (row) {

@@ -30,15 +30,15 @@ export const addArticle = (draft, data) => {
 // 获取文章的数据  draft:false 发表，true存入草稿
 export const articleInfo = (id) => {
   return fetch({
-    url: '/mp/v1_0/articles/'+ id,
+    url: '/mp/v1_0/articles/' + id,
     method: 'get'
   })
 }
 
 // 修改文章的数据  draft:false 发表，true存入草稿
-export const editArticle = (draft, data,id) => {
+export const editArticle = (draft, data, id) => {
   return fetch({
-    url: '/mp/v1_0/articles/'+ id,
+    url: '/mp/v1_0/articles/' + id,
     method: 'put',
     params: {
       draft
