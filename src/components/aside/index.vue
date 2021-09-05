@@ -1,5 +1,5 @@
 <template>
-  <el-menu class="menu" router :collapse="isCollapse" default-active="/" @open="handleOpen" @close="handleClose"
+  <el-menu class="menu" router :collapse="isCollapse" :default-active="$route.path" @open="handleOpen" @close="handleClose"
     background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
     <el-menu-item index="/">
       <i class="el-icon-menu"></i>

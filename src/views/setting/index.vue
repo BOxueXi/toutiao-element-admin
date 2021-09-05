@@ -19,7 +19,7 @@
             <el-input v-model="form.email"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">保存设置</el-button>
+            <el-button type="primary" @click="handleSave">保存设置</el-button>
             <el-button>取消</el-button>
           </el-form-item>
         </el-form>
@@ -37,11 +37,16 @@
       title="提示"
       :visible.sync="dialogVisible"
       append-to-body
-      width="30%">
-      <img :src="preImage" alt="" width="100%">
+      width="30%"
+      @opened="opened"
+      @closed="closedDialog"
+      >
+      <div>
+        <img ref="image" :src="preImage" alt="" width="100%">
+      </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="handleCrop">确 定</el-button>
       </span>
     </el-dialog>
   </el-card>
@@ -51,7 +56,9 @@
 /**
    * time          2021-8-26 10:17:58 ?F10: PM?
    */
-import { getUserData } from '@/api/user'
+import { getUserData, updateUserImg, editUser } from '@/api/user'
+import 'cropperjs/dist/cropper.css'
+import Cropper from 'cropperjs'
 export default {
   name: 'Setting',
   components: {
@@ -67,32 +74,75 @@ export default {
       },
       photo: '',
       preImage: '',
-      dialogVisible: false
+      dialogVisible: false,
+      cropper: null
     }
   },
   created () {
     this.getUserInfoData()
   },
   methods: {
-    onSubmit () {
-
-    },
     // 回填数据
     getUserInfoData () {
       getUserData().then(res => {
-        console.log(res)
         this.form = res.data
         this.photo = res.data.photo
       })
     },
     // 选择图片
     handleChange () {
-      console.log(121)
       this.dialogVisible = true
       const file = this.$refs.file
       const blobData = window.URL.createObjectURL(file.files[0])
       this.preImage = blobData
       this.$refs.file.value = '' // 处理选择的文件不变的情况
+    },
+    // Dialog 打开动画结束时的回调
+    opened () {
+      this.renderCropper()
+    },
+    // Dialog 关闭动画结束时的回调
+    closedDialog () {
+      this.cropper.destroy()
+    },
+    // 创建cropper
+    renderCropper () {
+      const image = this.$refs.image
+      // 需要图片完全加载才能初始化
+      this.cropper = new Cropper(image, {
+        aspectRatio: 1,
+        dragModeL: 'none'
+      })
+    },
+    // 确定裁切按钮
+    handleCrop () {
+      this.cropper.getCroppedCanvas().toBlob((file) => {
+        const formData = new FormData()
+        formData.append('photo', file)
+        updateUserImg(formData).then(res => {
+          const fileUrl = window.URL.createObjectURL(file)
+          this.dialogVisible = false
+          this.photo = fileUrl
+          this.$message.success('更新头像成功')
+          console.log(this.$store)
+          this.$store.dispatch('setting/getUser')
+        })
+      })
+    },
+    // 保存设置
+    handleSave () {
+      const {
+        email,
+        intro,
+        name
+      } = this.form
+      editUser({
+        email,
+        intro,
+        name
+      }).then(res => {
+        this.$message.success('保存设置成功')
+      })
     }
   }
 }
@@ -102,5 +152,9 @@ export default {
   .avatar-uploader {
     text-align: center;
     cursor: pointer;
+  }
+  img {
+    display: block;
+    max-width: 100%;  /* This rule is very important, please don't ignore this */
   }
 </style>

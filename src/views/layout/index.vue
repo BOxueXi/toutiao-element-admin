@@ -15,8 +15,8 @@
         </div>
         <el-dropdown :hide-on-click="false">
           <div class="avatar-box">
-            <el-avatar :src="userObj.photo"></el-avatar>
-            <span class="avatar-title">{{userObj.name}}</span>
+            <el-avatar :src="$store.state.setting.user.photo"></el-avatar>
+            <span class="avatar-title">{{$store.state.setting.user.name}}</span>
             <i class="el-icon-arrow-down el-icon--right"></i>
           </div>
           <el-dropdown-menu slot="dropdown">

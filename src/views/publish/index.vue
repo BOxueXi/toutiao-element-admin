@@ -15,6 +15,9 @@
           <el-radio :label="0">无图</el-radio>
           <el-radio :label="-1">自动</el-radio>
         </el-radio-group>
+        <div class="cover-box" v-if="form.cover.type>0">
+          <cover-item v-for="(item,index) in form.cover.type" v-model="form.cover.images[index]" :key="'item-'+index"></cover-item>
+        </div>
       </el-form-item>
       <el-form-item label="频道" prop="channel_id">
         <el-select v-model="form.channel_id" placeholder="请选择" clearable>
@@ -81,10 +84,12 @@ import {
 import {
   uploadImg
 } from '@/api/images'
+import CoverItem from './components/coverItem.vue'
 export default {
   name: 'Publish',
   components: {
-    'el-tiptap': ElementTiptap
+    'el-tiptap': ElementTiptap,
+    CoverItem
   },
   data () {
     return {
@@ -197,6 +202,15 @@ export default {
     handleAdd (draft) {
       this.$refs.form.validate((valid) => {
         if (valid) {
+          if (this.form.cover.type > 0) {
+            const images = []
+            console.log(this.form.cover.images.length)
+            for (let i = 0, len = this.form.cover.images.length; i < len; i++) {
+              console.log(12344)
+              images[i] = this.form.cover.images[i]
+            }
+            this.form.cover.images = images
+          }
           if (this.articleId) {
             editArticle(draft, this.form, this.articleId).then(res => {
               const mes = draft ? '保存草稿成功' : '发表成功'
@@ -243,5 +257,9 @@ export default {
 </script>
 
 <style scoped>
-
+.cover-box {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
 </style>
